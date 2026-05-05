@@ -1,0 +1,54 @@
+service: metabase
+image: metabase
+
+builder:
+  arch: arm64
+
+servers:
+  web:
+    - i-0df8f4697102d768c
+
+ssh:
+  user: ubuntu
+  proxy_command: >-
+    sh -c "aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'"
+
+deploy_timeout: 120
+
+proxy:
+  ssl: true
+  host: data.jetbuilt.com
+  app_port: 3000
+  healthcheck:
+    path: /api/health
+    interval: 10
+    timeout: 200
+
+registry:
+  server: 476548171748.dkr.ecr.us-east-1.amazonaws.com
+  username: AWS
+  password: <%= %x(aws ecr get-login-password) %>
+
+env:
+  clear:
+    MB_DB_TYPE: postgres
+    MB_DB_DBNAME: metabase
+    MB_DB_PORT: "5432"
+    MB_DB_USER: metabase
+    MB_DB_HOST: metabase-db
+    MB_DB_PASS: metabase
+    MB_SITE_URL: https://data.jetbuilt.com
+  secret:
+    - MB_ENCRYPTION_SECRET_KEY
+
+accessories:
+  db:
+    image: postgres:18
+    host: i-0df8f4697102d768c
+    env:
+      clear:
+        POSTGRES_DB: metabase
+        POSTGRES_USER: metabase
+        POSTGRES_PASSWORD: metabase
+    volumes:
+      - /data/postgres:/var/lib/postgresql
