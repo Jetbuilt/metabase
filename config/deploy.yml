@@ -16,9 +16,10 @@ ssh:
 deploy_timeout: 120
 
 proxy:
-  ssl: true
+  ssl: false
   host: data.jetbuilt.com
   app_port: 3000
+  forward_headers: true
   healthcheck:
     path: /api/health
     interval: 10
@@ -38,6 +39,14 @@ env:
     MB_DB_HOST: metabase-db
     MB_DB_PASS: metabase
     MB_SITE_URL: https://data.jetbuilt.com
+    MB_ENABLE_PUBLIC_SHARING: "false"
+    MB_ENABLE_EMBEDDING_STATIC: "false"
+    MB_ENABLE_EMBEDDING_INTERACTIVE: "false"
+    MB_ENABLE_EMBEDDING_SDK: "false"
+    MB_ENABLE_EMBEDDING_SIMPLE: "false"
+    MB_SESSION_COOKIES: "true"
+    MAX_SESSION_AGE: "720"
+    MB_ANON_TRACKING_ENABLED: "false"
   secret:
     - MB_ENCRYPTION_SECRET_KEY
 
